@@ -1,29 +1,16 @@
 import type { NextPage } from "next"
 import Head from "next/head"
 import styles from "../styles/Home.module.css"
-import * as datalog from "@datalogui/datalog"
 import { useState } from "react"
 import { useQuery } from "@datalogui/react"
-
-interface TodoInterface {
-  id: string
-  text: string
-  isCompleted: boolean
-}
-
-// Our main Todos table
-const Todos = datalog.newTable<TodoInterface>({
-  id: datalog.StringType,
-  text: datalog.StringType,
-  isCompleted: datalog.BoolType,
-})
+import { Todos, TodoInterface } from "./database"
 
 const Home: NextPage = () => {
   const [newTodoText, setNewTodoText] = useState("")
 
   // Reactive query to get all todos
-  const todos = useQuery(({ id, text }: TodoInterface) => {
-    Todos({ id, text, isCompleted: false })
+  const todos = useQuery(({ id, text, isCompleted }: TodoInterface) => {
+    Todos({ id, text, isCompleted })
   })
 
   const randomId = () => Math.random().toString(36).substring(2, 15)
@@ -32,6 +19,12 @@ const Home: NextPage = () => {
     e.preventDefault()
     Todos.assert({ id: randomId(), text: newTodoText, isCompleted: false })
     setNewTodoText("")
+  }
+
+  function markCompleted(id: string) {
+    console.log("id", id)
+    Todos.update({ id: id }, { isCompleted: true })
+    console.log("Todos", todos)
   }
 
   return (
@@ -59,7 +52,15 @@ const Home: NextPage = () => {
         <div>
           <h2>Your todos are:</h2>
           {todos.map((todo: TodoInterface) => (
-            <p key={todo.id}>{todo.text}</p>
+            <p key={todo.id}>
+              {todo.text}{" "}
+              <span
+                onClick={() => markCompleted(todo.id)}
+                style={{ cursor: "pointer" }}
+              >
+                ❌
+              </span>
+            </p>
           ))}
         </div>
       </main>
