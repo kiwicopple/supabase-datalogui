@@ -3,7 +3,7 @@ import Head from "next/head"
 import styles from "../styles/Home.module.css"
 import { useState } from "react"
 import { useQuery } from "@datalogui/react"
-import { Todos, TodoInterface } from "./database"
+import { Todos, TodoInterface, People, Manages } from "./database"
 
 const Home: NextPage = () => {
   const [newTodoText, setNewTodoText] = useState("")
@@ -13,10 +13,44 @@ const Home: NextPage = () => {
     Todos({ id, text, isCompleted: false })
   })
 
+  // Reactive query to get all managers
+  type ManagmentFilter = {
+    personID: number
+    personName: string
+    managerID: number
+    managerName: string
+  }
+
+  const managers = useQuery(
+    ({ personID, personName, managerID, managerName }: ManagmentFilter) => {
+      const people = { id: personID, name: personName }
+      const joinPeopleToManager = { managee: personID, manager: managerID }
+      const joinManagersToMangee = { id: managerID, name: managerName }
+
+      People(people) // Get all people -> return as { personID, personName }
+      Manages(joinPeopleToManager) // Join on the Manages table -> return as { personID, managerID }. Since "personID" is used twice, it has "joined" the data
+      People(joinManagersToMangee) // Now join on "managerID", and get the "managerName"
+
+      /**
+       * This is a bit like like:
+       * {
+       *   id: personID,
+       *   name: personName,
+       *   manager: {
+       *     id: personID,
+       *     name: managerName,
+       *   }
+       * }
+       *
+       */
+    }
+  )
+
   const randomId = () => Math.random().toString(36).substring(2, 15)
 
   function handleForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    console.log("managers", managers)
     Todos.assert({ id: randomId(), text: newTodoText, isCompleted: false })
     setNewTodoText("")
   }
