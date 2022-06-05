@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@datalogui/datalog": "^0.0.10",
+    "@datalogui/react": "^0.0.3",
+    "@supabase/supabase-js": "^1.35.3",
     "next": "12.1.6",
     "react": "18.1.0",
     "react-dom": "18.1.0"
