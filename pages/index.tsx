@@ -9,8 +9,8 @@ const Home: NextPage = () => {
   const [newTodoText, setNewTodoText] = useState("")
 
   // Reactive query to get all todos
-  const todos = useQuery(({ id, text, isCompleted }: TodoInterface) => {
-    Todos({ id, text, isCompleted })
+  const todos = useQuery(({ id, text }: TodoInterface) => {
+    Todos({ id, text, isCompleted: false })
   })
 
   const randomId = () => Math.random().toString(36).substring(2, 15)
@@ -23,8 +23,8 @@ const Home: NextPage = () => {
 
   function markCompleted(id: string) {
     console.log("id", id)
-    Todos.update({ id: id }, { isCompleted: true })
     console.log("Todos", todos)
+    Todos.update({ id: id }, { isCompleted: true })
   }
 
   return (
