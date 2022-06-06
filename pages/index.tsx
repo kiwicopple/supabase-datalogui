@@ -41,6 +41,11 @@ const Home: NextPage = () => {
        *     name: managerName,
        *   }
        * }
+       *  or with postgrest-js
+       * supabase.from('people').select(`
+       *   id:personId, name:personName,
+       *   manager (id:personId, name:managerName)
+       * `)
        *
        */
     }
